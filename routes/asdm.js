@@ -3,12 +3,8 @@ var router = express.Router();
 
 const request = require("request");
 
-/* GET users listing. */
-router.get('/', function (req, res, next) {
-    res.send('respond with a resource');
-});
 
-router.get("/asdm", function (req, res) {
+router.get("/", function (req, res) {
     request({
         url: "https://api.github.com/repos/sunwuyuan/AutoScratchDesktopMirror/releases/latest",
         method: "GET",
