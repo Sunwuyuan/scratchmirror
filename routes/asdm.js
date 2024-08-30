@@ -8,9 +8,9 @@ router.get('/', function (req, res, next) {
     res.send('respond with a resource');
 });
 
-router.get("/featured", function (req, res) {
+router.get("/asdm", function (req, res) {
     request({
-        url: "https://api.scratch.mit.edu/proxy/featured",
+        url: "https://api.github.com/repos/sunwuyuan/AutoScratchDesktopMirror/releases/latest",
         method: "GET",
     }, function (error, response, body) {
         //console.log(body);
@@ -19,5 +19,6 @@ router.get("/featured", function (req, res) {
         }
     })
 });
+
 
 module.exports = router;

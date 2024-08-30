@@ -45,6 +45,7 @@ var thumbnailsRouter = require('./routes/thumbnails');
 var avatarsRouter = require('./routes/avatars');
 var studiosRouter = require('./routes/studios');
 var proxyRouter = require('./routes/proxy');
+var asdmRouter = require('./routes/asdm');
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -52,7 +53,7 @@ app.use('/projects', projectsRouter);
 app.use('/thumbnails', thumbnailsRouter);
 app.use('/avatars', avatarsRouter);
 app.use('/studios', studiosRouter);
-app.use('/proxy', proxyRouter);
+app.use('/asdm', asdmRouter);
 
 
 
