@@ -1,7 +1,7 @@
 services:
   scratchmirror:
     restart: always
-    image: ghcr.io/scratchmirror:latest #自定义镜像名和版本号
+    image: ghcr.io/sunwuyuan/scratchmirror:latest #自定义镜像名和版本号
     container_name: scratchmirror
     ports:
       - 3068:3068
