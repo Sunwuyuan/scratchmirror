@@ -1,10 +1,7 @@
 services:
   scratchmirror:
     restart: always
-    build:
-      context: . #指定dockerfile文件的所在路径
-      dockerfile: Dockerfile #指定Dockerfile文件名称
-    image: scratchmirror:1.0.0 #自定义镜像名和版本号
+    image: ghcr.io/scratchmirror:latest #自定义镜像名和版本号
     container_name: scratchmirror
     ports:
       - 3068:3068
