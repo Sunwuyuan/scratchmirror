@@ -1,5 +1,5 @@
 services:
-  zerocat:
+  scratchmirror:
     restart: always
     build:
       context: . #指定dockerfile文件的所在路径
