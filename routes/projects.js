@@ -29,7 +29,7 @@ router.get("/explore/projects", function (req, res) {
 
 router.get("/search/projects", function (req, res) {
     request({
-        url: "https://api.scratch.mit.edu/explore/projects",
+        url: "https://api.scratch.mit.edu/search/projects",
         qs: {
             limit: req.query.limit || 16,
             language: req.query.language || 'zh-cn',

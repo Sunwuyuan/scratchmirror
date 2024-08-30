@@ -10,7 +10,7 @@ process.on('uncaughtException', function (err) {
 });
 var app = express();
 
-var corslist=["localhost","zerocat.houlangs.com","zerocat.wuyuan.dev","z.8r.ink",'zerocat-static.houlangs.com','zerocat-comment.houlangs.com','zerocatdev.github.io','zeronext.wuyuan.dev','python.190823.xyz','scratch.190823.xyz',"zerocat-test1.wuyuan.dev"]
+var corslist=["localhost","zerocat.houlangs.com","zerocat.wuyuan.dev","z.8r.ink",'zerocat-static.houlangs.com','zerocat-comment.houlangs.com','zerocatdev.github.io','zeronext.wuyuan.dev','python.190823.xyz','scratch.190823.xyz',"zerocat-test1.wuyuan.dev","scratch-editor.192325.xyz"]
 
 // cors配置
 var cors = require("cors");
@@ -42,13 +42,15 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var projectsRouter = require('./routes/projects');
 var thumbnailsRouter = require('./routes/thumbnails');
-var avatarsRouter = require('./routes/thumbnails');
+var avatarsRouter = require('./routes/avatars');
+var studiosRouter = require('./routes/studios');
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/projects', projectsRouter);
 app.use('/thumbnails', thumbnailsRouter);
 app.use('/avatars', avatarsRouter);
+app.use('/studios', studiosRouter);
 
 
 
