@@ -16,6 +16,8 @@ router.get("/featured", function (req, res) {
         //console.log(body);
         if (!error && response.statusCode == 200) {
             res.status(200).send(body);
+        }else {
+            res.status(404).send("Not Found");
         }
     })
 });

@@ -53,6 +53,7 @@ app.use('/projects', projectsRouter);
 app.use('/thumbnails', thumbnailsRouter);
 app.use('/avatars', avatarsRouter);
 app.use('/studios', studiosRouter);
+app.use('/proxy', proxyRouter);
 app.use('/asdm', asdmRouter);
 
 

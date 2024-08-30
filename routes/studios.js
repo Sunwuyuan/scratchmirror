@@ -16,6 +16,8 @@ router.get("/:id/projects", function (req, res) {
         //console.log(body);
         if (!error && response.statusCode == 200) {
             res.status(200).send(body);
+        }else {
+            res.status(404).send("Not Found");
         }
     })
 });
@@ -28,6 +30,8 @@ router.get("/:id/managers", function (req, res) {
         //console.log(body);
         if (!error && response.statusCode == 200) {
             res.status(200).send(body);
+        }else {
+            res.status(404).send("Not Found");
         }
     })
 });
@@ -39,6 +43,8 @@ router.get("/:id/curators", function (req, res) {
         //console.log(body);
         if (!error && response.statusCode == 200) {
             res.status(200).send(body);
+        }else {
+            res.status(404).send("Not Found");
         }
     })
 });
@@ -50,6 +56,8 @@ router.get("/:id", function (req, res) {
         //console.log(body);
         if (!error && response.statusCode == 200) {
             res.status(200).send(body);
+        }else {
+            res.status(404).send("Not Found");
         }
     })
 });

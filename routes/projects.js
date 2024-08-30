@@ -23,6 +23,8 @@ router.get("/explore/projects", function (req, res) {
         //console.log(body);
         if (!error && response.statusCode == 200) {
             res.status(200).send(body);
+        }else {
+            res.status(404).send("Not Found");
         }
     })
 });
@@ -42,6 +44,8 @@ router.get("/search/projects", function (req, res) {
         //console.log(body);
         if (!error && response.statusCode == 200) {
             res.status(200).send(body);
+        }else {
+            res.status(404).send("Not Found");
         }
     })
 });
@@ -53,6 +57,8 @@ router.get("/source/:id", function (req, res) {
         //console.log(body);
         if (!error && response.statusCode == 200) {
             res.status(200).send(body);
+        }else {
+            res.status(404).send("Not Found");
         }
     })
 });
@@ -65,6 +71,8 @@ router.get("/:id", function (req, res) {
         //console.log(body);
         if (!error && response.statusCode == 200) {
             res.status(200).send(body);
+        }else {
+            res.status(404).send("Not Found");
         }
     })
 });
