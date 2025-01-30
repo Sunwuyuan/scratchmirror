@@ -46,6 +46,7 @@ var avatarsRouter = require('./routes/avatars');
 var studiosRouter = require('./routes/studios');
 var proxyRouter = require('./routes/proxy');
 var asdmRouter = require('./routes/asdm');
+var newsRouter = require('./routes/news');
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -55,6 +56,7 @@ app.use('/avatars', avatarsRouter);
 app.use('/studios', studiosRouter);
 app.use('/proxy', proxyRouter);
 app.use('/asdm', asdmRouter);
+app.use('/news', newsRouter);
 
 
 
