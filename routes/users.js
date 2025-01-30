@@ -23,4 +23,18 @@ router.get("/:id", function (req, res) {
   })
 });
 
+router.get("/:id/projects", function (req, res) {
+  const {limit, offset} = req.query;
+  request({
+      url: `https://api.scratch.mit.edu/users/${req.params.id}/projects?offset=${offset}&limit=${limit || 16}`,
+      method: "GET",
+  }, function (error, response, body) {
+      //console.log(body);
+      if (!error && response.statusCode == 200) {
+          res.status(200).send(body);
+      }else {
+        res.status(404).send("Not Found");
+    }
+  })
+});
 module.exports = router;
