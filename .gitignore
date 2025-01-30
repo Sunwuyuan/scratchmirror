@@ -1,4 +1,5 @@
 node_modules
+
 file/avatars*
 !file/avatars/.gitkeep
 file/thumbnails*
