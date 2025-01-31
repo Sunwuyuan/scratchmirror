@@ -77,4 +77,17 @@ router.get("/:id", function (req, res) {
     })
 });
 
+router.get("/:id/remixes", function (req, res) {
+    request({
+        url: `https://api.scratch.mit.edu/projects/${req.params.id}/remixes?offset=${req.query.offset}&limit=${req.query.limit || 16}`,
+        method: "GET",
+    }, function (error, response, body) {
+        //console.log(body);
+        if (!error && response.statusCode == 200) {
+            res.status(200).send(body);
+        }else {
+            res.status(404).send("Not Found");
+        }
+    })
+});
 module.exports = router;
