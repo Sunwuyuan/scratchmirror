@@ -1,7 +1,7 @@
 var express = require("express");
 var router = express.Router();
-
-const request = require("request");
+const { fetchFromScratchAPI } = require("../utils/scratchAPI");
+const { cacheUsers, cacheProjects } = require("../utils/cacheData");
 
 /* GET users listing. */
 router.get("/", function (req, res, next) {
@@ -9,75 +9,52 @@ router.get("/", function (req, res, next) {
 });
 
 router.get("/:id/projects", function (req, res) {
-  request(
-    {
-      url: `https://api.scratch.mit.edu/studios/${
-        req.params.id
-      }/projects?offset=${req.query.offset}&limit=${req.query.limit || 16}`,
-      method: "GET",
-    },
-    function (error, response, body) {
-      //console.log(body);
-      if (!error && response.statusCode == 200) {
-        res.status(200).send(body);
-      } else {
-        res.status(404).send("Not Found");
-      }
+  const { limit, offset } = req.query;
+  fetchFromScratchAPI(`studios/${req.params.id}/projects`, { limit: limit || 16, offset }, function (error, data) {
+    if (error) {
+      res.status(404).send("Not Found");
+    } else {
+      const projectsData = JSON.parse(data);
+      cacheProjects(projectsData).catch(console.error);
+      res.status(200).send(data);
     }
-  );
+  });
 });
 
 router.get("/:id/managers", function (req, res) {
-  request(
-    {
-      url: `https://api.scratch.mit.edu/studios/${
-        req.params.id
-      }/managers?offset=${req.query.offset}&limit=${req.query.limit || 16}`,
-      method: "GET",
-    },
-    function (error, response, body) {
-      //console.log(body);
-      if (!error && response.statusCode == 200) {
-        res.status(200).send(body);
-      } else {
-        res.status(404).send("Not Found");
-      }
+  const { limit, offset } = req.query;
+  fetchFromScratchAPI(`studios/${req.params.id}/managers`, { limit: limit || 16, offset }, function (error, data) {
+    if (error) {
+      res.status(404).send("Not Found");
+    } else {
+      const usersData = JSON.parse(data);
+      cacheUsers(usersData).catch(console.error);
+      res.status(200).send(data);
     }
-  );
+  });
 });
+
 router.get("/:id/curators", function (req, res) {
-  request(
-    {
-      url: `https://api.scratch.mit.edu/studios/${
-        req.params.id
-      }/curators?offset=${req.query.offset}&limit=${req.query.limit || 16}`,
-      method: "GET",
-    },
-    function (error, response, body) {
-      //console.log(body);
-      if (!error && response.statusCode == 200) {
-        res.status(200).send(body);
-      } else {
-        res.status(404).send("Not Found");
-      }
+  const { limit, offset } = req.query;
+  fetchFromScratchAPI(`studios/${req.params.id}/curators`, { limit: limit || 16, offset }, function (error, data) {
+    if (error) {
+      res.status(404).send("Not Found");
+    } else {
+      const usersData = JSON.parse(data);
+      cacheUsers(usersData).catch(console.error);
+      res.status(200).send(data);
     }
-  );
+  });
 });
+
 router.get("/:id", function (req, res) {
-  request(
-    {
-      url: `https://api.scratch.mit.edu/studios/${req.params.id}`,
-      method: "GET",
-    },
-    function (error, response, body) {
-      //console.log(body);
-      if (!error && response.statusCode == 200) {
-        res.status(200).send(body);
-      } else {
-        res.status(404).send("Not Found");
-      }
+  fetchFromScratchAPI(`studios/${req.params.id}`, {}, function (error, data) {
+    if (error) {
+      res.status(404).send("Not Found");
+    } else {
+      res.status(200).send(data);
     }
-  );
+  });
 });
 
 module.exports = router;

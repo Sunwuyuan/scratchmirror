@@ -1,25 +1,20 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
-
-const request = require("request");
+const { fetchFromScratchAPI } = require("../utils/scratchAPI");
 
 /* GET users listing. */
-router.get('/', function (req, res, next) {
-    res.send('respond with a resource');
+router.get("/", function (req, res, next) {
+  res.send("respond with a resource");
 });
 
 router.get("/featured", function (req, res) {
-    request({
-        url: "https://api.scratch.mit.edu/proxy/featured",
-        method: "GET",
-    }, function (error, response, body) {
-        //console.log(body);
-        if (!error && response.statusCode == 200) {
-            res.status(200).send(body);
-        }else {
-            res.status(404).send("Not Found");
-        }
-    })
+  fetchFromScratchAPI("proxy/featured", {}, function (error, data) {
+    if (error) {
+      res.status(404).send("Not Found");
+    } else {
+      res.status(200).send(data);
+    }
+  });
 });
 
 module.exports = router;

@@ -4,3 +4,5 @@ file/avatars*
 !file/avatars/.gitkeep
 file/thumbnails*
 !file/thumbnails/.gitkeep
+
+.env

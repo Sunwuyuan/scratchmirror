@@ -1,0 +1,233 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model ow_comment {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  user_id    Int?
+  type       String?   @default("comment") @db.VarChar(64)
+  text       String?   @db.Text
+  insertedAt DateTime? @default(now()) @db.Timestamp(0)
+  user_ip    String?   @default("") @db.VarChar(100)
+  link       String?   @db.VarChar(128)
+  pid        Int?
+  rid        Int?
+  status     String    @default("") @db.VarChar(50)
+  user_ua    String?   @db.Text
+  url        String?   @db.VarChar(255)
+  page_type  String?   @db.VarChar(32)
+  page_id    Int?
+  createdAt  DateTime? @default(now()) @db.Timestamp(0)
+  updatedAt  DateTime? @default(now()) @db.Timestamp(0)
+  page_key   String?   @db.VarChar(128)
+}
+
+model ow_config {
+  id         Int       @id @default(autoincrement())
+  key        String    @unique(map: "config_key") @db.VarChar(255)
+  value      String    @db.Text
+  user_id    Int?
+  created_at DateTime? @default(now()) @db.DateTime(0)
+  updated_at DateTime? @default(now()) @db.DateTime(0)
+  is_public  Boolean?  @default(false)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ow_projects {
+  id             Int       @id @default(autoincrement()) @db.UnsignedInt
+  name           String    @db.VarChar(128)
+  default_branch String    @default("main") @db.VarChar(128)
+  type           String?   @default("text") @db.VarChar(32)
+  license        String?   @db.VarChar(32)
+  authorid       Int
+  teacherid      Int?      @default(0) @db.UnsignedInt
+  state          String?   @default("private") @db.VarChar(32)
+  view_count     Int?      @default(0) @db.UnsignedInt
+  like_count     Int?      @default(0)
+  favo_count     Int?      @default(0)
+  time           DateTime? @default(now()) @db.Timestamp(0)
+  title          String?   @default("Scratch新项目") @db.VarChar(1000)
+  description    String?   @default("OurWorld上的Scratch项目") @db.VarChar(1000)
+  history        Boolean   @default(true)
+  devenv         Boolean   @default(true)
+  tags           String    @default("") @db.VarChar(100)
+}
+
+model ow_projects_branch {
+  id                 Int     @id @default(autoincrement())
+  name               String  @db.VarChar(128)
+  latest_commit_hash String  @db.VarChar(64)
+  description        String  @db.VarChar(128)
+  projectid          Int
+  protected          String? @default("false") @db.VarChar(45)
+  creator            Int?
+
+  @@unique([projectid, name], map: "unique_project_branch")
+}
+
+model ow_projects_commits {
+  id               String   @db.VarChar(256)
+  project_id       Int
+  author_id        Int
+  branch           String   @default("main") @db.VarChar(255)
+  parent_commit_id String?  @db.VarChar(256)
+  commit_message   String   @db.Text
+  commit_date      DateTime @db.DateTime(0)
+  commit_file      String   @db.VarChar(256)
+
+  @@id([id, project_id])
+}
+
+model ow_projects_file {
+  sha256        String    @id @db.VarChar(64)
+  source        String?   @db.MediumText
+  create_time   DateTime? @default(now()) @db.DateTime(0)
+  create_userid Int?
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ow_projects_history {
+  id          Int      @id @default(autoincrement()) @db.UnsignedInt
+  authorid    Int      @db.UnsignedInt
+  projectid   Int      @db.UnsignedInt
+  type        String?  @default("text") @db.VarChar(32)
+  time        DateTime @default(now()) @db.Timestamp(0)
+  title       String?  @default("ZeroCat新项目") @db.VarChar(50)
+  description String?  @default("commit") @db.VarChar(1000)
+  source      String?  @db.MediumText
+  state       String?  @default("private") @db.VarChar(32)
+  licence     String?  @db.VarChar(45)
+  tags        String?  @db.VarChar(100)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ow_projects_lists {
+  id          Int       @id @default(autoincrement())
+  authorid    Int?
+  title       String?   @default("收藏夹") @db.VarChar(1024)
+  description String?   @default("列表") @db.VarChar(1024)
+  state       String?   @default("private") @db.VarChar(32)
+  list        String?   @db.MediumText
+  updateTime  DateTime? @db.Timestamp(0)
+  createTime  DateTime? @default(now()) @db.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ow_projects_stars {
+  id         Int       @id @default(autoincrement())
+  userid     Int
+  projectid  Int
+  type       String    @default("star") @db.VarChar(32)
+  value      Int       @default(1) @db.TinyInt
+  listid     Int?
+  createTime DateTime? @default(now()) @db.Timestamp(0)
+}
+
+model ow_projects_tags {
+  id         Int       @id @default(autoincrement())
+  name       String    @db.VarChar(45)
+  projectid  Int
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+
+  @@index([projectid], map: "idx_projectid")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ow_users {
+  id           Int       @unique(map: "id_UNIQUE") @default(autoincrement())
+  username     String    @unique(map: "user_UNIQUE") @db.Char(20)
+  email        String    @id @db.Char(100)
+  password     String    @db.VarChar(255)
+  display_name String    @default("OurWorld创作者") @db.Char(20)
+  state        Int       @default(0) @db.TinyInt
+  loginTime    DateTime? @db.Timestamp(0)
+  regTime      DateTime? @default(now()) @db.Timestamp(0)
+  sex          String?   @default("0") @db.VarChar(16)
+  birthday     DateTime? @default(dbgenerated("'2000-03-31 16:00:00'")) @db.Timestamp(0)
+  motto        String?   @default("OurWorld创作者") @db.VarChar(1000)
+  images       String?   @default("fcd939e653195bb6d057e8c2519f5cc7") @db.VarChar(255)
+  avatar       String?   @default("https://owcdn.190823.xyz/user/fcd939e653195bb6d057e8c2519f5cc7") @db.VarChar(255)
+  type         String?   @default("guest") @db.VarChar(50)
+  url          String?   @db.VarChar(255)
+  github       String?   @db.VarChar(255)
+  twitter      String?   @db.VarChar(255)
+  facebook     String?   @db.VarChar(255)
+  google       String?   @db.VarChar(255)
+  weibo        String?   @db.VarChar(255)
+  qq           String?   @db.VarChar(255)
+  fa           String?   @map("2fa") @db.VarChar(255)
+  createdAt    DateTime? @default(dbgenerated("'2000-03-31 16:00:00'")) @db.Timestamp(0)
+  updatedAt    DateTime? @default(dbgenerated("'2000-03-31 16:00:00'")) @db.Timestamp(0)
+  label        String?   @db.VarChar(255)
+}
+
+model ow_users_magiclink {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  token     String   @unique(map: "token") @db.VarChar(255)
+  expiresAt DateTime @db.DateTime(0)
+}
+
+model ow_users_totp {
+  id                Int       @id @default(autoincrement())
+  name              String    @default("验证器") @db.VarChar(128)
+  user_id           Int
+  type              String    @default("totp") @db.VarChar(45)
+  status            String    @default("unverified") @db.VarChar(32)
+  totp_secret       String?   @db.VarChar(255)
+  totp_algorithm    String?   @default("SHA256") @db.VarChar(10)
+  totp_digits       Int?      @default(6)
+  totp_period       Int?      @default(30)
+  totp_last_updated DateTime? @db.Timestamp(0)
+  created_at        DateTime? @default(now()) @db.Timestamp(0)
+  updated_at        DateTime? @default(now()) @db.Timestamp(0)
+}
+
+model scratchmirror_projects {
+  id                  BigInt                             @id
+  title               String                             @db.Text
+  description         String?                            @db.Text
+  instructions        String?                            @db.Text
+  visibility          scratchmirror_projects_visibility?
+  public              Boolean?
+  comments_allowed    Boolean?
+  is_published        Boolean?
+  history_created_at  DateTime?                          @db.DateTime(0)
+  history_modified_at DateTime?                          @db.DateTime(0)
+  history_shared_at   DateTime?                          @db.DateTime(0)
+  stats_views         Int?                               @default(0)
+  stats_loves         Int?                               @default(0)
+  stats_favorites     Int?                               @default(0)
+  stats_remixes       Int?                               @default(0)
+  image               String?                            @db.VarChar(255)
+  author_id           BigInt
+  remix_parent        Int?
+  remix_root          Int?
+}
+
+model scratchmirror_users {
+  id             Int       @id
+  username       String?   @db.VarChar(45)
+  scratchteam    Int?      @db.TinyInt
+  history_joined DateTime? @db.Timestamp(0)
+  profile_id     Int?
+  status         String?   @db.Text
+  bio            String?   @db.Text
+  country        String?   @db.Text
+}
+
+model sys_ini {
+  id       Int     @id @default(autoincrement()) @db.UnsignedInt
+  iniKey   String? @db.Char(16)
+  iniValue String? @db.Char(64)
+}
+
+enum scratchmirror_projects_visibility {
+  visible
+  hidden
+}

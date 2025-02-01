@@ -58,8 +58,6 @@ app.use('/proxy', proxyRouter);
 app.use('/asdm', asdmRouter);
 app.use('/news', newsRouter);
 
-
-
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
