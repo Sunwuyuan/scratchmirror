@@ -1,4 +1,4 @@
-const request = require("request");
+import request from "request";
 
 function fetchFromScratchAPI(path, query, callback) {
   const baseUrl = "https://api.scratch.mit.edu/";
@@ -25,4 +25,4 @@ function fetchFromProjectAPI(path, query, callback) {
     }
   });
 }
-module.exports = { fetchFromScratchAPI, fetchFromProjectAPI };
+export  { fetchFromScratchAPI, fetchFromProjectAPI };

@@ -1,23 +1,21 @@
-var express = require("express");
-var router = express.Router();
-const request = require("request");
-const axios = require("axios");
-const fs = require("fs");
-const path = require("path");
+import { Router } from "express";
+var router = Router();
+import axios from "axios";
+import { writeFile, access, constants } from "fs";
+import { join } from "path";
 
 /* GET users listing. */
 router.get("/", function (req, res, next) {
   res.send("respond with a resource");
 });
 function download(projectId, res) {
-  const filepath = path.join(
+  const filepath = join(
     __dirname,
     "..",
     `/file/thumbnails/${projectId}.png`
   );
 
-  axios
-    .get(
+  axios.get(
       `https://uploads.scratch.mit.edu/projects/thumbnails/${projectId}.png`,
       {
         responseType: "arraybuffer",
@@ -32,7 +30,7 @@ function download(projectId, res) {
       //console.log(response);
       //console.log(response.headers);
       if (response) {
-        fs.writeFile(filepath, response.data, function (err) {
+        writeFile(filepath, response.data, function (err) {
           if (err) {
             res.status(500).send("Internal Server Error");
             return;
@@ -50,12 +48,12 @@ router.get("/retry/:id", function (req, res) {
   download(req.params.id, res);
 });
 router.get("/:id", function (req, res) {
-  const filepath = path.join(
+  const filepath = join(
     __dirname,
     "..",
     `/file/thumbnails/${req.params.id}.png`
   );
-  fs.access(filepath, fs.constants.F_OK, (err) => {
+  access(filepath, constants.F_OK, (err) => {
     //console.log('文件判断');
     if (err) {
       download(req.params.id, res);
@@ -65,4 +63,4 @@ router.get("/:id", function (req, res) {
     }
   });
 });
-module.exports = router;
+export default router;

@@ -1,7 +1,7 @@
-var express = require("express");
-var router = express.Router();
-const { fetchFromScratchAPI, fetchFromProjectAPI } = require("../utils/scratchAPI");
-const { cacheProject } = require("../utils/cacheData");
+import { Router } from "express";
+var router = Router();
+import { fetchFromScratchAPI, fetchFromProjectAPI } from "../utils/scratchAPI.js";
+import { cacheProject } from "../utils/cacheData.js";
 
 /* GET users listing. */
 router.get("/", function (req, res, next) {
@@ -63,4 +63,4 @@ router.get("/:id/remixes", function (req, res) {
   });
 });
 
-module.exports = router;
+export default router;

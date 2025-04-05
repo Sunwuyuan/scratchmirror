@@ -1,7 +1,7 @@
-var express = require("express");
-var router = express.Router();
-const { fetchFromScratchAPI } = require("../utils/scratchAPI");
-const { cacheUser, cacheUsers, cacheProjects } = require("../utils/cacheData");
+import { Router } from "express";
+var router = Router();
+import { fetchFromScratchAPI } from "../utils/scratchAPI.js";
+import { cacheUser, cacheUsers, cacheProjects } from "../utils/cacheData.js";
 
 /* GET users listing. */
 router.get("/", function (req, res, next) {
@@ -59,4 +59,4 @@ router.get("/:id/followers", function (req, res) {
   });
 });
 
-module.exports = router;
+export default router;

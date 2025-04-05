@@ -1,4 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
+import { PrismaClient } from "@prisma/client";
 
 const useDatabase = process.env.USE_DATABASE === 'true';
 console.log(useDatabase===true?'使用数据库':'不使用数据库');
@@ -110,4 +110,4 @@ async function cacheProjects(projectsData) {
   }
 }
 
-module.exports = { cacheUser, cacheUsers, cacheProject, cacheProjects };
+export  { cacheUser, cacheUsers, cacheProject, cacheProjects };

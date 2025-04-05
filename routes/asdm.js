@@ -1,6 +1,6 @@
-var express = require("express");
-var router = express.Router();
-const request = require("request");
+import { Router } from "express";
+var router = Router();
+import request from "request";
 
 var releases = {};
 function fetchFromScratchAPI(url, callback) {
@@ -33,4 +33,4 @@ router.get("/", function (req, res) {
   res.json(releases);
 });
 
-module.exports = router;
+export default router;
