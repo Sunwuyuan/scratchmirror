@@ -22,22 +22,24 @@ function download(projectId, res) {
       }
     )
     .catch(function (err) {
-      //console.log(`Error in axios.get:`, err);
-      res.status(500).send("Internal Server Error");
+      console.error(`Error in axios.get for project ID ${projectId}:`, err);
+      res.status(500).send({
+        message: "An error occurred while downloading the thumbnail.",
+        error: err.message || "Unknown error"
+      });
       return;
     })
     .then(function (response) {
-      //console.log(response);
-      //console.log(response.headers);
       if (response) {
         writeFile(filepath, response.data, function (err) {
           if (err) {
-            res.status(500).send("Internal Server Error");
+            console.error(`Error writing file for project ID ${projectId}:`, err);
+            res.status(500).send({
+              message: "An error occurred while saving the thumbnail.",
+              error: err.message || "Unknown error"
+            });
             return;
-
-            //console.log(err)
           }
-          //console.log('保存成功');
           res.sendFile(filepath);
           return;
         });
@@ -54,8 +56,8 @@ router.get("/:id", function (req, res) {
     `/file/thumbnails/${req.params.id}.png`
   );
   access(filepath, constants.F_OK, (err) => {
-    //console.log('文件判断');
     if (err) {
+      console.error(`File does not exist for project ID ${req.params.id}, downloading:`, err);
       download(req.params.id, res);
     } else {
       res.sendFile(filepath);

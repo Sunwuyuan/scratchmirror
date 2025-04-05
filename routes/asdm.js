@@ -20,12 +20,15 @@ fetchFromScratchAPI(
   "https://api.github.com/repos/sunwuyuan/AutoScratchDesktopMirror/releases/latest",
   function (error, response, body) {
     if (error) {
-      console.log(body);
-      console.log(error);
+      console.error("Error fetching latest release:", error);
       return;
     }
-    releases = JSON.parse(response.body);
-    console.log("success to get latest version");
+    try {
+      releases = JSON.parse(response.body);
+      console.log("Successfully fetched latest version");
+    } catch (parseError) {
+      console.error("Error parsing release data:", parseError);
+    }
   }
 );
 

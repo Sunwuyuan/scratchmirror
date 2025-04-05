@@ -10,7 +10,11 @@ router.get("/", function (req, res, next) {
 router.get("/featured", function (req, res) {
   fetchFromScratchAPI("proxy/featured", {}, function (error, data) {
     if (error) {
-      res.status(404).send("Not Found");
+      console.error("Error fetching featured data:", error);
+      res.status(500).send({
+        message: "An error occurred while fetching featured data.",
+        error: error.message || "Unknown error"
+      });
     } else {
       res.status(200).send(data);
     }

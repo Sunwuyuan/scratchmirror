@@ -15,29 +15,30 @@ function download(projectId,res) {
     axios.get(`https://uploads.scratch.mit.edu/users/avatars/${projectId}.png`, {
         responseType: 'arraybuffer'
     }).catch(function (err) {
-        //console.log(`Error in axios.get:`, err);
-        res.status(500).send('Internal Server Error');
+        console.error(`Error in axios.get for avatar ID ${projectId}:`, err);
+        res.status(500).send({
+            message: 'An error occurred while downloading the avatar.',
+            error: err.message || 'Unknown error'
+        });
         return;
-
     })
         .then(function (response) {
-            //console.log(response);
-            //console.log(response.headers);
             if (response) {
                 writeFile(filepath, response.data, function (err) {
-
                     if (err) {
-                        res.status(500).send('Internal Server Error');
+                        console.error(`Error writing file for avatar ID ${projectId}:`, err);
+                        res.status(500).send({
+                            message: 'An error occurred while saving the avatar.',
+                            error: err.message || 'Unknown error'
+                        });
                         return;
-
-                        //console.log(err)
-                    };
-                    //console.log('保存成功');
+                    }
                     res.sendFile(filepath);
                     return;
-                })
+                });
             }
-        });}
+        });
+}
 router.get("/retry/:id", function (req, res) {
 
     download(req.params.id,res)
@@ -45,9 +46,9 @@ router.get("/retry/:id", function (req, res) {
 router.get("/:id", function (req, res) {
     const filepath = join(__dirname, '..', `/file/avatars/${req.params.id}.png`);
     access(filepath, constants.F_OK, (err) => {
-        //console.log('文件判断');
         if (err) {
-            download(req.params.id,res)
+            console.error(`File does not exist for avatar ID ${req.params.id}, downloading:`, err);
+            download(req.params.id, res);
         } else {
             res.sendFile(filepath);
             return;
