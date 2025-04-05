@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const { fetchFromScratchAPI } = require("../utils/scratchAPI");
+const { fetchFromScratchAPI, fetchFromProjectAPI } = require("../utils/scratchAPI");
 const { cacheProject } = require("../utils/cacheData");
 
 /* GET users listing. */
@@ -31,7 +31,7 @@ router.get("/search/projects", function (req, res) {
 });
 
 router.get("/source/:id", function (req, res) {
-  fetchFromScratchAPI(`projects/${req.params.id}`, { token: req.query.token }, function (error, data) {
+  fetchFromProjectAPI(`${req.params.id}?token=${req.query.token}`, {}, function (error, data) {
     if (error) {
       res.status(404).send("Not Found");
     } else {
