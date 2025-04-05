@@ -14,7 +14,7 @@ function fetchFromScratchAPI(path, query, callback) {
 }
 
 function fetchFromProjectAPI(path, query, callback) {
-  const baseUrl = "https://project.scratch.mit.edu/";
+  const baseUrl = "https://projects.scratch.mit.edu/";
   const url = `${baseUrl}${path}?${new URLSearchParams(query).toString()}`;
 
   request({ url, method: "GET" }, function (error, response, body) {
