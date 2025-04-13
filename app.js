@@ -4,42 +4,25 @@ import './instrumentation.js';
 
 import createError from 'http-errors';
 import express from 'express';
-import cookieParser from 'cookie-parser';
-import logger from 'morgan';
+import setupMiddleware from './middleware/index.js';
+import errorHandler from './middleware/errorHandler.js';
+import { apiLimiters } from './utils/ratelimit/index.js';
+import { getCacheStats } from './utils/cache/cacheManager.js';
+import { getUserRateLimitStats } from './utils/ratelimit/index.js';
+import { defaultEnvConfig } from './utils/security/envConfig.js';
 
-
+// 处理未捕获的异常
 process.on('uncaughtException', function (err) {
-  console.log('Caught exception: ', err);
+  console.error('Caught exception: ', err);
 });
+
+// 创建Express应用
 const app = express();
 
-var corslist=["localhost","zerocat.houlangs.com","zerocat.wuyuan.dev","z.8r.ink",'zerocatdev.github.io','zeronext.wuyuan.dev','scratch.190823.xyz',"scratch-editor.192325.xyz"]
+// 应用中间件
+setupMiddleware(app);
 
-// cors配置
-import cors from "cors";
-var corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin || corslist.indexOf(new URL(origin).hostname) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  preflightContinue: false,
-  optionsSuccessStatus: 200,
-  credentials: true,
-};
-app.use(cors(corsOptions)); // 应用CORS配置函数
-// view engine setup
-app.set("views", process.cwd() + "/views");
-app.set('view engine', 'ejs');
-
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-
+// 导入路由
 import indexRouter from './routes/index.js';
 import usersRouter from './routes/users.js';
 import projectsRouter from './routes/projects.js';
@@ -50,29 +33,65 @@ import proxyRouter from './routes/proxy.js';
 import asdmRouter from './routes/asdm.js';
 import newsRouter from './routes/news.js';
 
+// 应用路由和路由特定的限速中间件
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/projects', projectsRouter);
-app.use('/thumbnails', thumbnailsRouter);
-app.use('/avatars', avatarsRouter);
-app.use('/studios', studiosRouter);
-app.use('/proxy', proxyRouter);
-app.use('/asdm', asdmRouter);
-app.use('/news', newsRouter);
-// catch 404 and forward to error handler
+app.use('/users', apiLimiters.users, usersRouter);
+app.use('/projects', apiLimiters.projects, projectsRouter);
+app.use('/thumbnails', apiLimiters.thumbnails, thumbnailsRouter);
+app.use('/avatars', apiLimiters.avatars, avatarsRouter);
+app.use('/studios', apiLimiters.studios, studiosRouter);
+app.use('/proxy', apiLimiters.proxy, proxyRouter);
+app.use('/asdm', apiLimiters.proxy, asdmRouter); // 使用与proxy相同的严格限制
+app.use('/news', apiLimiters.news, newsRouter);
+
+// 添加API状态和限速统计端点
+app.get('/api/status', (req, res) => {
+  res.json({
+    status: 'ok',
+    version: process.env.npm_package_version || '1.0.0',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    environment: defaultEnvConfig.isDevelopment() ? 'development' : 'production'
+  });
+});
+
+app.get('/api/stats', (req, res) => {
+  // 只允许本地或授权请求访问统计信息
+  const isAuthorized = req.ip === '127.0.0.1' || 
+                       req.ip === '::1' || 
+                       req.headers['x-admin-key'] === process.env.ADMIN_API_KEY;
+  
+  if (!isAuthorized) {
+    return res.status(403).json({
+      status: 'error',
+      message: '没有权限访问此资源'
+    });
+  }
+  
+  res.json({
+    status: 'ok',
+    rateLimit: getUserRateLimitStats(),
+    cache: getCacheStats(),
+    memory: {
+      heapTotal: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
+      heapUsed: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+      rss: Math.round(process.memoryUsage().rss / 1024 / 1024),
+      external: Math.round(process.memoryUsage().external / 1024 / 1024)
+    }
+  });
+});
+
+// 健康检查端点
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'healthy' });
+});
+
+// 捕获404并转发到错误处理程序
 app.use(function(req, res, next) {
   next(createError(404));
 });
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
+// 错误处理中间件
+app.use(errorHandler);
 
 export default app;

@@ -1,68 +1,40 @@
 import { Router } from "express";
 var router = Router();
-import axios from "axios";
-import { writeFile, access, constants } from "fs";
-import { join } from "path";
+import { fetchFromScratchAPI } from "../utils/scratchAPI.js";
+import { cacheManager } from "../utils/cache/index.js";
 
-/* GET users listing. */
-router.get("/", function (req, res, next) {
-  res.send("respond with a resource");
-});
-function download(projectId, res) {
-  const filepath = join(
-    __dirname,
-    "..",
-    `/file/thumbnails/${projectId}.png`
-  );
-
-  axios.get(
-      `https://uploads.scratch.mit.edu/projects/thumbnails/${projectId}.png`,
-      {
-        responseType: "arraybuffer",
-      }
-    )
-    .catch(function (err) {
-      console.error(`Error in axios.get for project ID ${projectId}:`, err);
-      res.status(500).send({
-        message: "An error occurred while downloading the thumbnail.",
-        error: err.message || "Unknown error"
-      });
-      return;
-    })
-    .then(function (response) {
-      if (response) {
-        writeFile(filepath, response.data, function (err) {
-          if (err) {
-            console.error(`Error writing file for project ID ${projectId}:`, err);
-            res.status(500).send({
-              message: "An error occurred while saving the thumbnail.",
-              error: err.message || "Unknown error"
-            });
-            return;
-          }
-          res.sendFile(filepath);
-          return;
-        });
-      }
-    });
-}
-router.get("/retry/:id", function (req, res) {
-  download(req.params.id, res);
-});
 router.get("/:id", function (req, res) {
-  const filepath = join(
-    __dirname,
-    "..",
-    `/file/thumbnails/${req.params.id}.png`
-  );
-  access(filepath, constants.F_OK, (err) => {
-    if (err) {
-      console.error(`File does not exist for project ID ${req.params.id}, downloading:`, err);
-      download(req.params.id, res);
-    } else {
-      res.sendFile(filepath);
-      return;
+  const id = req.params.id;
+  
+  // 尝试从缓存获取缩略图数据
+  const cachedThumbnail = cacheManager.getThumbnailFromCache(id);
+  if (cachedThumbnail) {
+    // 如果是Buffer或字符串形式的图片数据，直接返回
+    if (typeof cachedThumbnail === 'string' && cachedThumbnail.startsWith('data:image')) {
+      const base64Data = cachedThumbnail.split(',')[1];
+      const buffer = Buffer.from(base64Data, 'base64');
+      res.set('Content-Type', 'image/png');
+      return res.send(buffer);
     }
-  });
+    // 如果是URL，重定向到该URL
+    else if (typeof cachedThumbnail === 'string' && (cachedThumbnail.startsWith('http://') || cachedThumbnail.startsWith('https://'))) {
+      return res.redirect(cachedThumbnail);
+    }
+    // 如果是JSON对象，返回JSON
+    else if (typeof cachedThumbnail === 'object') {
+      return res.status(200).send(cachedThumbnail);
+    }
+  }
+  
+  // 如果缓存中没有，从Scratch API获取
+  const thumbnailUrl = `https://cdn2.scratch.mit.edu/get_image/project/${id}_480x360.png`;
+  
+  // 对于缩略图，我们直接重定向到Scratch CDN
+  // 这样可以减少服务器负载，同时保持响应速度
+  // 但我们仍然在缓存中记录这个URL，以便将来可能的优化
+  cacheManager.cacheThumbnail(id, thumbnailUrl, 86400); // 缓存24小时
+  
+  res.redirect(thumbnailUrl);
 });
+
 export default router;
