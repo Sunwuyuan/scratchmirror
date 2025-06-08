@@ -13,7 +13,7 @@ process.on('uncaughtException', function (err) {
 });
 const app = express();
 
-var corslist=["localhost","zerocat.houlangs.com","zerocat.wuyuan.dev","z.8r.ink",'zerocatdev.github.io','zeronext.wuyuan.dev','scratch.190823.xyz',"scratch-editor.192325.xyz"]
+var corslist=["localhost","zerocat.houlangs.com","zerocat.wuyuan.dev",'scratch.190823.xyz',"scratch-editor.192325.xyz","zerocat.dev"]
 
 // cors配置
 import cors from "cors";
