@@ -39,7 +39,7 @@ router.get("/search/projects", function (req, res) {
 });
 
 router.get("/source/:id", function (req, res) {
-  fetchFromProjectAPI(`${req.params.id}?token=${req.query.token}`, {}, function (error, data) {
+  fetchFromProjectAPI(`${req.params.id}`, {token:req.query.token}, function (error, data) {
     if (error) {
       console.error(`Error fetching project source for ID ${req.params.id}:`, error);
       res.status(500).send({
