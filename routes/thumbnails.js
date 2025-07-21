@@ -1,8 +1,13 @@
 import { Router } from "express";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 var router = Router();
 import axios from "../utils/axios.js";
 import { writeFile, access, constants } from "fs";
 import { join } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 /* GET users listing. */
 router.get("/", function (req, res, next) {
