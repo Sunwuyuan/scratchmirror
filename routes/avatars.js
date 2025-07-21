@@ -1,7 +1,6 @@
 import { Router } from 'express';
 var router = Router();
-import request from "request";
-import axios from 'axios';
+import axios from '../utils/axios.js';
 import { writeFile, access, constants } from 'fs';
 import { join } from 'path';
 
